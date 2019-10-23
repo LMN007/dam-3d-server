@@ -10,7 +10,7 @@ def upload_model():
     model_info = request.get_json()
     print(type(model_info))
     print(model_info['filename'])
-    con = databaseInit()
+    # con = databaseInit()
     url = createURL(con, model_info)
     message = sendMessage(con, model_info)
     # with open("./a_simple_pokeball.zip","rb") as f:
@@ -18,7 +18,7 @@ def upload_model():
     model_new,path = lzw(message)
     return "{}"
     
-
-if __name__ == "__main__":
-    con = databaseInit()
-    app.run(debug=True)
+#
+# if __name__ == "__main__":
+#     con = databaseInit()
+#     app.run(debug=True)
