@@ -1,0 +1,9 @@
+**/unzipped
+unzipped
+cache
+__pycache__
+**/__pycache__
+*.exe
+test.png
+*.zip
+web
