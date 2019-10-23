@@ -10,3 +10,4 @@ web
 venv
 .idea
 assets/models
+*.bak
