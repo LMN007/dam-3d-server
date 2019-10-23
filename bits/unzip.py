@@ -1,30 +1,36 @@
 import zipfile
-# import rarfile
-import base64
-import os
-import re
 import hashlib
 import requests
-import json
 from bits.snapshot import *
-
-
+import json
 target_format = ".gltf"
 cache_path = "./cache"
-unzip_path = "./unzipped"
+unzip_path = "./assets/models"
 headers = {'Content-Type': 'application/json'}
 
+# message = {
+#     "model":"",
+#     "name":"",
+#     "model_id":"",
+# }
+# with open("./Dilophosaurus.zip","rb") as f:
+#     message['model'] = base64.b64encode(f.read())
+# message['name'] = "Dilophosaurus.zip"
+# message['model_id'] = "1"
 
-def lzw(message):
+
+def refine(message):
     model_name,model_path = base64toFiles(message['model'],message['name']+str(message['model_id']))
     files = os.listdir(model_path)
     flag = 3  # 0 - gltf     1 - obj     2 - fbx    3 - error
     convert_file = ""
+    ok = False
     for f in files:
         format = f.split('.')[-1]
         if format == "gltf":
             flag = 0
             convert_file = f
+            ok = True
             break
         elif format == 'obj':
             flag = 1
@@ -43,14 +49,25 @@ def lzw(message):
             "dst":os.path.abspath(os.path.join(unzip_path,model_name).replace("\\","/"))
         }
         sign = requests.post("http://127.0.0.1:5300/api/fbx2gltf",headers=headers,data=json.dumps(data))
+        res = json.loads(bytes.decode(sign.content))
+        ok = res['ok']
+        convert_file = res['converted']
     elif flag == 1:
         data = {
             "src":os.path.abspath(os.path.join(model_path,convert_file).replace("\\","/")),
             "dst":os.path.abspath(os.path.join(unzip_path,model_name).replace("\\","/"))
         }
         sign = requests.post("http://127.0.0.1:5300/api/obj2gltf",headers=headers,data=json.dumps(data))
-    model_info = modelSnapshot('./bits/template.html',os.path.abspath(model_path),os.path.abspath(os.path.join(model_path,convert_file).replace("\\","/")))
-    return model_info,os.path.join(unzip_path, model_name)
+        res = json.loads(bytes.decode(sign.content))
+        ok = res['ok']
+        convert_file = res['converted']
+    if ok:
+        model_info = modelSnapshot(os.path.abspath('./bits/template.html'),os.path.abspath(model_path),"../"+os.path.join(model_path,convert_file).replace("\\","/"))
+    else:
+        return None
+    return model_info,model_name
+
+
 
 
 def base64toFiles(src_file_data,src_name):

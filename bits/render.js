@@ -25,8 +25,8 @@ class CanvasManager {
     getCanvasRelativePosition(event) {
         const rect = this.canvas.getBoundingClientRect();
         return {
-          x: event.clientX - rect.left,
-          y: event.clientY - rect.top,
+            x: event.clientX - rect.left,
+            y: event.clientY - rect.top,
         };
     }
 
@@ -49,7 +49,7 @@ const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer({antialias : true, powerPreference:'high-performance', alpha: true});
 const canvas = new CanvasManager(frame, renderer.domElement, renderer);
 const camera = new THREE.PerspectiveCamera(75, canvas.Aspect(), 0.1, 1000);
-const textureSky = new THREE.CubeTextureLoader().setPath( './assets/static/skybox/' ).load( [
+const textureSky = new THREE.CubeTextureLoader().setPath( './static/skybox/' ).load( [
     'hills2_rt_px.png',
     'hills2_lf_nx.png',
     'hills2_up_py.png',
@@ -68,6 +68,7 @@ camera.position.z = 5;
 
 const ambientLight = new THREE.AmbientLight( 0x404040 ); // soft white light
 scene.add( ambientLight );
+
 const light = new THREE.PointLight( 0xffffff, 1, 100 );
 light.position.set( 20, 20, 20 );
 scene.add( light );
@@ -76,7 +77,9 @@ const plight = new THREE.PointLight( 0xffffff, 1, 200 );
 plight.position.set( -40, 20, 20 );
 scene.add( plight );
 
-
+//const pplight = new THREE.PointLight( 0xffffff, 50, 200 );
+//pplight.position.set( 10, 15, 10 );
+//scene.add( pplight );
 
 let modelInfo = {
     vertices : 0,
@@ -93,7 +96,7 @@ let snapshot = "";
 
 
 function render() {
-    requestAnimationFrame(render);
+    // requestAnimationFrame(render);
     renderer.render(scene, camera);
 }
 
@@ -101,8 +104,8 @@ const loader = new THREE.GLTFLoader();
 // loadgltf("./models/vysehrad_-_statue_of_zaboj_and_slavoj/scene.gltf");
 // loadgltf("./models/3dinktober2019-ash/scene.gltf");
 // loadgltf("./models/toon_female_base_mesh/scene.gltf");
-// loadgltf("./models/paladin_sword/scene.gltf ");
-// loadgltf("./unzipped/b4f49c98/scene.gltf ");
+// loadgltf("./models/a_simple_pokeball/scene.gltf ");
+//loadgltf("../assets/models/b9a1465c/scene.gltf");
 function loadgltf(url){
     loader.load(url, (m)=>{
         m.scene.traverse(obj =>{
@@ -141,15 +144,15 @@ function loadgltf(url){
 
         let vec = box.max.clone().sub(box.min);
         console.log(vec);
-        let scale = 0.000296;
-        // let scale = 5 / Math.max(vec.x,vec.y,vec.z);
+        // let scale = 0.000296;
+        let scale = 5 / Math.max(vec.x,vec.y,vec.z);
         modelInfo.scale = scale;
         m.scene.scale.set(scale, scale, scale);
 
         box.setFromObject(m.scene);
         const mid = box.max.clone().add(box.min).multiplyScalar((0.5));
         console.log(m.scene.position);
-        // m.scene.position.set(-mid.x,-mid.y,-mid.z);
+        m.scene.position.set(-mid.x,-mid.y,-mid.z);
 
         console.log(mid);
         console.log(m.scene);
@@ -175,10 +178,10 @@ function loadgltf(url){
             {
                 for(let y in modelInfo[x])
                 {
-                   let div_child = document.createElement("div");
-                   div_child.id = y;
-                   div_child.innerText = modelInfo[x][y];
-                   div.appendChild(div_child);
+                    let div_child = document.createElement("div");
+                    div_child.id = y;
+                    div_child.innerText = modelInfo[x][y];
+                    div.appendChild(div_child);
                 }
             }
             else

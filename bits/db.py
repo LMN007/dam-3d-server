@@ -1,12 +1,8 @@
 import sqlite3
 import os
-import re
 import time
-from fuzzywuzzy import fuzz, process
+from fuzzywuzzy import fuzz
 import hashlib
-# from bits.snapshot import *
-import base64
-# import requests
 
 def createURL(con, model_dict):
     sql = "select max(model_ID) from model;"
@@ -20,7 +16,7 @@ def createURL(con, model_dict):
         id = c.fetchall()[0][0] + 1
         print(id)
        
-        model_dict['owner'] = "金中子月月鸟"
+        model_dict['owner'] = "wsh"
         owner = model_dict['owner']
         name = model_dict['name'].split(".")[0]
         folderName = name + str(id)
@@ -44,15 +40,15 @@ def sendMessage(con, model_dict):
         con.commit()
     except Exception as e:
         print(e)
-    else:
-        send_to_zzp = {}
-        model_id = c.fetchall()[0][0] + 1
-        model_name = model_dict['name'].split(".")[0]
-        model_base64 = model_dict['model']
-        send_to_zzp['name'] = model_name
-        send_to_zzp['model_id'] = model_id
-        send_to_zzp['model'] = model_base64
-        return send_to_zzp
+        raise e
+    send_to_zzp = {}
+    model_id = c.fetchall()[0][0] + 1
+    model_name = model_dict['name'].split(".")[0]
+    model_base64 = model_dict['model']
+    send_to_zzp['name'] = model_name
+    send_to_zzp['model_id'] = model_id
+    send_to_zzp['model'] = model_base64
+    return send_to_zzp
 
 # 创建name和type表
 def createModelsTable(con):
