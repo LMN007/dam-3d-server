@@ -6,7 +6,7 @@ import os
 import sqlite3
 from contextlib import closing
 import gc
-from wtforms import Form, TextField, PasswordField, BooleanField, validators
+# from wtforms import Form, TextField, PasswordField, BooleanField, validators
 from passlib.hash import sha256_crypt
 
 app = Flask(__name__)
@@ -55,16 +55,16 @@ def upload_model():
     
 
 
-class RegistrationForm(Form):
-    username = TextField('username', [validators.Length(min=2, max=20)])
-    nickname = TextField('nickname', [validators.length(min=2,max=20)])
-    location = TextField('location')
-    introduction = TextField('introduction', [validators.length(max=128)])
-    biography = TextField('biography', [validators.length(max=265)])
-    avatar = TextField('avatar')
-    email = TextField('Email', [validators.Length(min=6, max=50)])
-    password = PasswordField('Password', [validators.DataRequired(), validators.EqualTo('confirm', message='Passwords must match.')])
-    confirm = PasswordField('Password Again')
+# class RegistrationForm(Form):
+#     username = TextField('username', [validators.Length(min=2, max=20)])
+#     nickname = TextField('nickname', [validators.length(min=2,max=20)])
+#     location = TextField('location')
+#     introduction = TextField('introduction', [validators.length(max=128)])
+#     biography = TextField('biography', [validators.length(max=265)])
+#     avatar = TextField('avatar')
+#     email = TextField('Email', [validators.Length(min=6, max=50)])
+#     password = PasswordField('Password', [validators.DataRequired(), validators.EqualTo('confirm', message='Passwords must match.')])
+#     confirm = PasswordField('Password Again')
 
 
 
@@ -142,6 +142,7 @@ def login():
             password = request.form['password']
             '''
             user_info = request.get_json()
+            
             print(user_info)
             username=user_info['username']
             password=user_info['password']
