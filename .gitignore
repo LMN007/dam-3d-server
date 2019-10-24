@@ -11,3 +11,5 @@ venv
 .idea
 assets/models
 *.bak
+
+*.sql
