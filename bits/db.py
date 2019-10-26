@@ -1,8 +1,12 @@
 import sqlite3
 import os
 import time
+import gc
+import base64
 from fuzzywuzzy import fuzz
 import hashlib
+from passlib.hash import sha256_crypt
+
 
 def createURL(con, model_dict):
     sql = "select max(model_ID) from model;"
@@ -15,7 +19,7 @@ def createURL(con, model_dict):
     else:
         id = c.fetchall()[0][0] + 1
         print(id)
-       
+
         model_dict['owner'] = "wsh"
         owner = model_dict['owner']
         name = model_dict['name'].split(".")[0]
@@ -29,7 +33,6 @@ def createURL(con, model_dict):
         else:
             os.makedirs(url)
         return url
-
 
 
 def sendMessage(con, model_dict):
@@ -51,6 +54,8 @@ def sendMessage(con, model_dict):
     return send_to_zzp
 
 # 创建name和type表
+
+
 def createModelsTable(con):
     sql = "create table model (model_ID INTEGER PRIMARY KEY AUTOINCREMENT, "\
         "model_name varchar(20),"\
@@ -71,11 +76,13 @@ def createModelsTable(con):
         print("Create table model success!")
 
 # 建立Tag表
+
+
 def createTagTable(con):
-    
+
     sql = "create table tag (model_ID INTEGER," \
         "tag_name varchar(100),"\
-        "FOREIGN KEY(model_ID) REFERENCES model(model_ID));" 
+        "FOREIGN KEY(model_ID) REFERENCES model(model_ID));"
     try:
         c = con.cursor()
         c.execute(sql)
@@ -86,10 +93,13 @@ def createTagTable(con):
         print("Create table tag success!")
 
 # 插入新model
+
+
 def insertModel(con, model_dict, url):
     model_name = model_dict['name']
     type_name = model_dict['catalog']
-    publish_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+    publish_time = time.strftime(
+        '%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
     num_triangles = model_dict['num_triangles']
     num_vertices = model_dict['num_vertices']
     if model_dict['animated'] == False:
@@ -126,7 +136,7 @@ def insertModel(con, model_dict, url):
 
             for tag in tags:
                 insertTag(con, model_id, tag)
-            # sql_3 = "update model set url = '" + url + "' where publish_time = '" + publish_time + "';" 
+            # sql_3 = "update model set url = '" + url + "' where publish_time = '" + publish_time + "';"
             # try:
             #     c3 = con.cursor()
             #     c3.execute(sql_3)
@@ -140,6 +150,7 @@ def insertModel(con, model_dict, url):
     else:
         print("Insert Success!")
 
+
 def selectNameFromModel(con):
     sql = "select model_ID, model_name from model"
     try:
@@ -150,6 +161,7 @@ def selectNameFromModel(con):
         print(e)
     else:
         return c.fetchall()
+
 
 def fuzzyName(con, name_list, input_name):
     fuzzy_dict = {}
@@ -162,6 +174,8 @@ def fuzzyName(con, name_list, input_name):
     return fuzzy_sorted
 
 # 根据id获取模型全部信息
+
+
 def fromIdGetMessage(con, id):
     sql = "select * from model where model_ID = " + str(id) + ";"
     try:
@@ -175,6 +189,8 @@ def fromIdGetMessage(con, id):
         return tuple2json(con, model_tuple)
 
 # 将模型信息包装为JSON
+
+
 def tuple2json(con, model_tuple):
     print(model_tuple)
     model_json = {}
@@ -193,6 +209,7 @@ def tuple2json(con, model_tuple):
     print(model_json)
     return(model_json)
 
+
 def fromTagGetName(con, tag_name):
     sql = "select model_ID from tag where tag_name = '" + tag_name + "';"
     try:
@@ -204,8 +221,9 @@ def fromTagGetName(con, tag_name):
     else:
         model_list = []
         for id in c.fetchall():
-            model_list.append(fromIdGetMessage(con,id[0]))
+            model_list.append(fromIdGetMessage(con, id[0]))
         return model_list
+
 
 def fromIdGetTag(con, id):
     sql = "select tag_name from tag where model_ID = " + str(id) + ";"
@@ -217,13 +235,14 @@ def fromIdGetTag(con, id):
         print(e)
     else:
         tag_list = []
-        for tag in  count.fetchall():
+        for tag in count.fetchall():
             tag_list.append(tag[0])
         return tag_list
 
+
 def insertTag(con, id, tag):
     if(len(isExistInTag(con, id, tag)) != 0):
-        print("The tag:" + tag + " of " + str(id) +" has already exists!")
+        print("The tag:" + tag + " of " + str(id) + " has already exists!")
     else:
         sql = "insert into tag values(" + str(id) + ", '" + tag + "')"
         try:
@@ -235,8 +254,10 @@ def insertTag(con, id, tag):
         else:
             print("Insert " + tag + " success!")
 
+
 def isExistInTag(con, id, tag):
-    sql = "select * from tag where model_ID =  " + str(id) + " and tag_name = '" + tag + "';"
+    sql = "select * from tag where model_ID =  " + \
+        str(id) + " and tag_name = '" + tag + "';"
     try:
         c = con.cursor()
         c.execute(sql)
@@ -248,6 +269,8 @@ def isExistInTag(con, id, tag):
 
 ############################################################分割线################################################
 # 通过标签查询模型
+
+
 def fromNameGetTag(con, model_name):
     #id = len(selectID(model_name))
     sql = "select tag_name from tag where model_name =  '" + model_name + "';"
@@ -260,19 +283,187 @@ def fromNameGetTag(con, model_name):
     else:
         return c.fetchall()
 
-def databaseInit():    
+
+def registerUser(form):
+    #print("in function")
+    print(form)
+    error = False
+    msg = ''
+    username = form['username']
+    nickname = form['nickname']
+    location = form['location']
+    introduction = form['introduction']
+    biography = form['biography']
+    email = form['email']
+    avatar = form['avatar']
+    if not os.path.exists("assets/avatars"):
+        os.makedirs("assets/avatars")
+    avatarPATH = "assets/avatars/{}.png".format(username)
+    f = open(avatarPATH, 'wb')
+    data = base64.b64decode(avatar)
+    f.write(data)
+    f.close()
+    avatar = avatarPATH
+    #print(str(form['password']))
+    password = sha256_crypt.encrypt(str(form['password']))  # encode paassword
+    db = databaseInit()
+    cur = db.cursor()
+    x = cur.execute(
+        'SELECT * FROM user WHERE username = ?', [username])
+    queryRes = x.fetchall()
+    if len(queryRes) != 0:
+        error = True
+        msg = 'That username is already taken, please choose another'
+        #flash("That username is already taken, please choose another")
+        #return render_template('register.html', form=form)
+    else:
+        cur.execute("INSERT INTO user (username, nickname, password, location, introduction, biography, email, avatar) VALUES(?,?,?,?,?,?,?,?)", [
+                    username, nickname, password, location, introduction, biography, email, avatar])
+        db.commit()
+        #flash("Thanks for registering!")
+        cur.close()
+        db.close()
+        gc.collect()      # collect garbage
+        msg = 'succeed in registering'
+    #print(msg)
+    return error, msg
+
+
+def dbLogin(form):
+    username = form['username']
+    password = form['password']
+    error = False
+    msg = ""
+    db = databaseInit()
+    cur = db.cursor()
+    passwd_hash_tuple = cur.execute('SELECT password FROM user WHERE username=?', [username]).fetchone()   # return a tuple
+    if not passwd_hash_tuple:
+        error=True
+        msg = 'Invalid username'
+    elif not (sha256_crypt.verify(str(password), passwd_hash_tuple[0])):
+        error=True
+        msg = 'Invalid password'
+    else:
+        msg='login success'
+    db.commit()
+    cur.close()
+    db.close()
+    gc.collect()           
+    return error, msg
+
+
+def dbUpdateAvatar(form):
+    error = False
+    msg = ''
+    username = form['username']
+    avatar = form['avatar']
+    avatarPATH = "assets/avatars/{}.png".format(username)
+    f = open(avatarPATH, 'wb')
+    data = base64.b64decode(avatar)
+    f.write(data)
+    f.close()
+    msg = 'succeed in updating avatar'
+    return error, msg
+
+
+def dbUpdatePasswd(form):
+    error = False
+    msg = ''
+    username = form['username']
+
+    password = sha256_crypt.encrypt(str(form['password']))  # encode paassword
+    db = databaseInit()
+    cur = db.cursor()
+    x = cur.execute(
+        'SELECT * FROM user WHERE username = ?', [username])
+    queryRes = x.fetchall()
+    passwd_hash_tuple = cur.execute(
+        'SELECT password FROM user WHERE username=?', [username]).fetchone()
+    if len(queryRes) != 0:
+        error = True
+        msg = 'No such user!'
+    elif (sha256_crypt.verify(str(password), passwd_hash_tuple[0])):
+        error = True
+        msg = 'You should not use the same password'
+    else:
+        cur.execute("UPDATE user SET password = ? WHERE username = ?", [
+                    password, username])
+        db.commit()
+        cur.close()
+        db.close()
+        gc.collect()      # collect garbage
+        msg = 'succeed in updating password'
+    return error, msg
+
+
+def dbUpdateBasic(form):
+    error = False
+    msg = ''
+    username = form['username']
+    location = form['location']
+    introduction = form['introduction']
+    biography = form['biography']
+    email = form['email']
+
+    db = databaseInit()
+    cur = db.cursor()
+    cur.execute("UPDATE user SET location = ?, introduction = ?, biography = ?, email = ? WHERE username = ?", [
+                location, introduction, biography, email, username])
+    db.commit()
+    cur.close()
+    db.close()
+    gc.collect()      # collect garbage
+    msg = 'succeed in updating basic info'
+    return error, msg
+
+
+def getUserData(username):
+    db = databaseInit()
+    cur = db.cursor()
+    x = cur.execute(
+        'SELECT * FROM user WHERE username = ?', [username])
+    userTuple = x.fetchall()
+
+    u = cur.execute(
+        'select model_ID,url from model where model_ID in (select modelID from user_product where username = ?)', [username])
+    URL = u.fetchall()
+    modelURL = []
+    for each in URL:
+        modelURL.append(str(each[1]))
+    #print(modelURL)
+    #read the avatar
+    avatarPATH = "assets/avatars/{}.png".format(username)
+    f = open(avatarPATH, 'rb')
+    data=f.read()
+    avatar = base64.b64encode(data)
+    f.close()
+    userJson = {}
+    userJson['username'] = str(username)
+    userJson['nickname'] = userTuple[0][1]
+    userJson['biography'] = userTuple[0][5]
+    userJson['owned_models'] = modelURL
+    userJson['location'] = userTuple[0][3]
+    userJson['introduction'] = userTuple[0][4]
+    userJson['collections'] = ""
+    userJson['email'] = userTuple[0][6]
+    userJson['avatar'] = avatar
+    print(userJson)
+    return userJson
+
+
+def databaseInit():
     con = sqlite3.connect('database/models.db')
     createModelsTable(con)
     createTagTable(con)
     model_dict = {
-        'url': '/JSON',  # 
+        'url': '/JSON',  #
         'name': 'zzpdl.gltf',   #
-        'publish': 'time',   
+        'publish': 'time',
         #'comments': [],
         'catalog': 'Human',
         'num_triangles': 100,  #
         'num_vertices': 150,  #
-        'tags': ['kami', 'sama'], 
+        'tags': ['kami', 'sama'],
         'animated': False,   #
         'render_config': 'string',
         'owner': 'string'
@@ -286,15 +477,8 @@ def databaseInit():
     # print(model_info)
     # print(path)
 
-
     # insertModel(con, model_dict, url)
 
     # # 5、输入关键词，返回id和匹配度的字典
     # fuzzyName(con, selectNameFromModel(con), "zp")
-    # # {7: 100, 1: 80, 2: 80, 3: 80, 4: 80, 8: 80, 5: 67, 6: 67, 9: 67, 10: 67, 11: 67, 12: 67, 13: 67, 14: 67, 15: 67, 16: 67, 17: 67, 18: 67}   
-
-
-
-
-
-    
+    # # {7: 100, 1: 80, 2: 80, 3: 80, 4: 80, 8: 80, 5: 67, 6: 67, 9: 67, 10: 67, 11: 67, 12: 67, 13: 67, 14: 67, 15: 67, 16: 67, 17: 67, 18: 67}
