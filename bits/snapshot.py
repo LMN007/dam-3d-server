@@ -14,11 +14,11 @@ chrome_options.add_argument('--disable-gpu')
 chrome_options.add_argument("--start-maximized")
 chrome_options.add_argument('window-size=2560,1440')
 
-
+# print(os.getcwd())
 driver = webdriver.Chrome(chrome_options=chrome_options,executable_path="chromedriver.exe")
 def modelSnapshot(template_path, save_path,data_path):
     driver.get(os.path.abspath(template_path))
-    model_info = {}
+    model_info = []
     model_info['maps'] ={}
     driver.execute_script("loadgltf(arguments[0]);", data_path)
     attempt = 0
