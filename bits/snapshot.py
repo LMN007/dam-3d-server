@@ -13,12 +13,13 @@ chrome_options.add_argument('--headless')
 chrome_options.add_argument('--disable-gpu')
 chrome_options.add_argument("--start-maximized")
 chrome_options.add_argument('window-size=2560,1440')
-
+chrome_options.add_argument("--log-level=3")
 # print(os.getcwd())
 driver = webdriver.Chrome(chrome_options=chrome_options,executable_path="chromedriver.exe")
 def modelSnapshot(template_path, save_path,data_path):
+    
     driver.get(os.path.abspath(template_path))
-    model_info = []
+    model_info = {}
     model_info['maps'] ={}
     driver.execute_script("loadgltf(arguments[0]);", data_path)
     attempt = 0
@@ -40,7 +41,7 @@ def modelSnapshot(template_path, save_path,data_path):
             snapshotDiv = driver.find_element_by_id('snapshot')
             # print(data_path, " ", model_info)
             driver.get_screenshot_as_file("./test.png")
-            with open(os.path.join(save_path,"snapshot.png"),"wb") as f:
+            with open(os.path.join(save_path,"preview.png"),"wb") as f:
                 f.write(base64.b64decode(snapshotDiv.text.split(',')[1]))
             # with open(os.path.join(output_path,"data.json"),"w",encoding="utf-8") as f:
             #     f.write(json.dumps(model_info))
