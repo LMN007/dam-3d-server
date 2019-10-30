@@ -2,6 +2,7 @@ import sqlite3
 import os
 import time
 import gc
+import re
 import base64
 from fuzzywuzzy import fuzz
 import hashlib
@@ -93,6 +94,10 @@ def createTagTable(con):
         print("Create table tag success!")
 
 # 插入新model
+
+
+def createGroupTable(con):
+    #sql = "create table group"
 
 
 def insertModel(con, model_dict, url):
@@ -316,6 +321,9 @@ def registerUser(form):
         msg = 'That username is already taken, please choose another'
         #flash("That username is already taken, please choose another")
         #return render_template('register.html', form=form)
+    elif not re.findall('^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$',email) and not email=='':
+        error = True
+        msg = 'Please use the right format of the email'
     else:
         cur.execute("INSERT INTO user (username, nickname, password, location, introduction, biography, email, avatar) VALUES(?,?,?,?,?,?,?,?)", [
                     username, nickname, password, location, introduction, biography, email, avatar])
@@ -413,6 +421,11 @@ def dbUpdateBasic(form):
     cur.close()
     db.close()
     gc.collect()      # collect garbage
+
+    if not re.findall('^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$',email) and not email=='':
+        error = True
+        msg = 'Please use the right format of the email'
+        return error,msg
     msg = 'succeed in updating basic info'
     return error, msg
 
