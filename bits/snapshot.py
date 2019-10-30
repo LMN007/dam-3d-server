@@ -11,13 +11,13 @@ chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-web-security")
 chrome_options.add_argument('--headless')
 chrome_options.add_argument('--disable-gpu')
-chrome_options.add_argument("--start-maximized")
-chrome_options.add_argument('window-size=2560,1440')
+# chrome_options.add_argument("--start-maximized")
+# chrome_options.add_argument('window-size=2560,1440')
 chrome_options.add_argument("--log-level=3")
-# print(os.getcwd())
-driver = webdriver.Chrome(chrome_options=chrome_options,executable_path="chromedriver.exe")
+driver = webdriver.Chrome(chrome_options=chrome_options, executable_path="./chromedriver.exe")
+
+
 def modelSnapshot(template_path, save_path,data_path):
-    
     driver.get(os.path.abspath(template_path))
     model_info = {}
     model_info['maps'] ={}
@@ -37,20 +37,19 @@ def modelSnapshot(template_path, save_path,data_path):
                 model_info['maps'][mapDiv.get_attribute('id')] = mapDiv.text
             if model_info.__len__() < 2:
                 print(data_path)
-            #models_info.append(model_info)
             snapshotDiv = driver.find_element_by_id('snapshot')
-            # print(data_path, " ", model_info)
             driver.get_screenshot_as_file("./test.png")
             with open(os.path.join(save_path,"preview.png"),"wb") as f:
                 f.write(base64.b64decode(snapshotDiv.text.split(',')[1]))
-            # with open(os.path.join(output_path,"data.json"),"w",encoding="utf-8") as f:
-            #     f.write(json.dumps(model_info))
             break
         except:
             time.sleep(1)
             attempt += 1
+    # driver.execute_script("init();")
     return model_info
-# modelSnapshot("./template.html","./unzipped","./textures")
-# driver.execute_script("init();")
-# modelSnapshot("./template.html",os.path.abspath("../assets/models/b9a1465c"),os.path.abspath("../assets/models/b9a1465c/scene.gltf"))
-# driver.quit()
+
+
+
+
+# modelSnapshot("./template.html",  os.path.abspath("../assets/models/2e1816c0").replace("\\","/"),  os.path.abspath("../assets/models/2e1816c0/scene.gltf").replace("\\","/")  )
+

@@ -35,7 +35,7 @@ def createURL(con, model_dict):
         return url
 
 
-def sendMessage(con, model_dict):
+def sendMessage(con, model_dict,user):
     sql = "select max(model_ID) from model;"
     try:
         c = con.cursor()
@@ -48,6 +48,7 @@ def sendMessage(con, model_dict):
     model_id = c.fetchall()[0][0] + 1
     model_name = model_dict['name'].split(".")[0]
     model_base64 = model_dict['model']
+    send_to_zzp['user'] = user
     send_to_zzp['name'] = model_name
     send_to_zzp['model_id'] = model_id
     send_to_zzp['model'] = model_base64

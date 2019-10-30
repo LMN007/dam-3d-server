@@ -18,6 +18,14 @@ def retImage(p):
     return send_from_directory(unzip_path,os.path.join(p,'scene.gltf'),as_attachment=True)
 
 
+@app.route("/media/model/<path:p>",methods=['GET','POST'])
+@auth.must_login()
+def retModel(p):
+    print(os.path.join(unzip_path,p))
+    return send_from_directory(unzip_path,p)
+
+
+
 @app.route("/api/upload/model", methods = ['GET', 'POST'])
 @auth.must_login()
 def upload_model():
@@ -26,10 +34,10 @@ def upload_model():
         print(model_info['filename'])
         con = databaseInit()
         # url = createURL(con, model_info)
-        message = sendMessage(con, model_info)
+        user = session['username']
+        message = sendMessage(con, model_info,user)
         model_add_info,model_name,url = refine(message)
         model_info['model'] = ''
-        user = session['username']
         # print(model_add_info)
         # print(model_info)
         # print(model_name)
@@ -130,7 +138,6 @@ def updateAvatar():
          return jsonify({'code':4,'msg':"{}".format(e)})
 
 
-
 @app.route('/api/user/update/passwd')
 @auth.must_login()
 def updatePasswd():
@@ -167,9 +174,41 @@ def updateBasic():
          return jsonify({'code':4,'msg':"{}".format(e)})
 
 
+@app.route("/api/model/update/preview",methods=['POST'])
+@auth.must_login()
+def updatePreview():
+    try:
+        form = request.get_json()
+        # print(form)
+        split = form['url'].split('/')
+        model_path = os.path.join(unzip_path,split[-2],split[-1])
+        print(model_path)
+        preview = form['preview']
+        with open(os.path.join(model_path,"preview.png"),"wb") as f:
+            f.write(base64.b64decode(preview.split(',')[-1]))
+        return jsonify({"code":0,"msg":"success"})
+    except Exception as e:
+        return jsonify({"code":1,"msg":"{}".format(e)})
+
+
+@app.route("/api/model/update/render_config",methods=['POST'])
+@auth.must_login()
+def updateRenderConfig():
+    try:
+        form = request.get_json()
+        print(form)
+        split = form['url'].split('/')
+        model_path = os.path.join(unzip_path,split[-2],split[-1])
+        print(model_path)
+        config = form['config']
+        with open(os.path.join(model_path,"config.json"),"w") as f:
+            f.write(json.dumps(config))
+        return jsonify({"code":0,"msg":"success"})
+    except Exception as e:
+        return jsonify({"code":1,"msg":"{}".format(e)})
+
 
 
 if __name__ == "__main__":
     con = databaseInit()
-    
     app.run(debug=True)

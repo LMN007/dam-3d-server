@@ -76,7 +76,7 @@ app.post("/api/fbx2gltf", bodyParser.json(), async (req,res) => {
 	let src = req.body['src'];
 	let dst = req.body['dst'];
 	let ok = false;
-	let converted = ""
+	let converted = "";
 	await fbx2gltf(src, dst+'\\'+output_name, ['--khr-materials-unlit']).then(
 		destPath => {
 			let files = fs.readdirSync(dst);

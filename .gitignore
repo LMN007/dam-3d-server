@@ -17,3 +17,6 @@ assets/models
 converter/node_modules/
 **/node_modules/
 converter/yarn.lock
+**/snapshot2/
+**/avatars/
+**/assets/
