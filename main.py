@@ -12,9 +12,11 @@ app.config['MODEL_PATH'] = unzip_path
 
 auth = Auth(not_login={'code': 1, 'msg': 'User must be logged in'})
 
+
 @app.route("/media/image/<path:p>",methods=['GET','POST'])
 def retImage(p):
     return send_from_directory(unzip_path,os.path.join(p,'scene.gltf'),as_attachment=True)
+
 
 @app.route("/api/upload/model", methods = ['GET', 'POST'])
 @auth.must_login()
@@ -36,6 +38,7 @@ def upload_model():
     except Exception as e:
         return jsonify({'code':1, 'msg': '{}'.format(e)})
 
+
 @app.route('/api/list/user/models', methods=['POST', 'GET'])
 @auth.must_login()
 def list_models():
@@ -44,12 +47,14 @@ def list_models():
     username = info['username']
     return jsonify(getUserModels(con, username))
 
+
 @app.route('/api/list/categories/recommend', methods=['POST', 'GET'])
 def get_recommend():
     req = request.get_json()
     con = databaseInit()
     cat = req['catalogs']
     return jsonify(getModelsbyCategories(con, cat))
+
 
 @app.route('/api/user/register', methods=['POST', 'GET'])
 def register():
@@ -101,10 +106,12 @@ def login():
         print("error")
         return jsonify({'code':4,'msg':"{}".format(e)})
 
+
 @app.route('/api/user/logout')
 def logout():
     session.pop('logged_in', None)
     return jsonify({'code':0,'msg':"success"})
+
 
 @app.route('/api/user/update/avatar')
 @auth.must_login()
@@ -122,7 +129,8 @@ def updateAvatar():
     except Exception as e:
          return jsonify({'code':4,'msg':"{}".format(e)})
 
-        
+
+
 @app.route('/api/user/update/passwd')
 @auth.must_login()
 def updatePasswd():
@@ -139,6 +147,7 @@ def updatePasswd():
 
     except Exception as e:
          return jsonify({'code':4,'msg':"{}".format(e)})
+
 
 @app.route('/api/user/update/basic')
 @auth.must_login()
