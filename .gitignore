@@ -13,3 +13,7 @@ assets/models
 *.bak
 
 *.sql
+.vscode
+converter/node_modules/
+**/node_modules/
+converter/yarn.lock

@@ -1,0 +1,26 @@
+{
+  "name": "myobj2gltf",
+  "version": "1.0.0",
+  "description": "none",
+  "main": "server.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "test",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "none"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "fbx2gltf": "^0.9.7-p1",
+    "obj2gltf": "^3.0.4"
+  }
+}

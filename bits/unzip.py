@@ -65,7 +65,7 @@ def refine(message):
         model_info = modelSnapshot(os.path.abspath('./bits/template.html'),os.path.abspath(model_path),"../"+os.path.join(model_path,convert_file).replace("\\","/"))
     else:
         return None
-    return model_info,model_name
+    return model_info,model_name, model_path
 
 
 

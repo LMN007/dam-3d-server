@@ -96,24 +96,24 @@ def createTagTable(con):
 # 插入新model
 
 
+<<<<<<< HEAD
 def createGroupTable(con):
     #sql = "create table group"
 
 
 def insertModel(con, model_dict, url):
+=======
+def insertModel(con, model_dict, model_add_dict, user, url):
+>>>>>>> d33345e2bf940d7eaee60b910c48fe17cc1f1a70
     model_name = model_dict['name']
     type_name = model_dict['catalog']
     publish_time = time.strftime(
         '%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-    num_triangles = model_dict['num_triangles']
-    num_vertices = model_dict['num_vertices']
-    if model_dict['animated'] == False:
-        animated = 0
-    else:
-        animated = 1
-    owner = model_dict['owner']
+    num_triangles = model_add_dict['triangles']
+    num_vertices = model_add_dict['vertices']
+    animated = 0
+    owner = user
     tags = model_dict['tags']
-    # url = "/models/" + type_name +"/"
     sql = "insert into model values (NULL," \
         "'" + model_name + "',"  \
         "'" + type_name + "',"\
@@ -141,15 +141,15 @@ def insertModel(con, model_dict, url):
 
             for tag in tags:
                 insertTag(con, model_id, tag)
-            # sql_3 = "update model set url = '" + url + "' where publish_time = '" + publish_time + "';"
-            # try:
-            #     c3 = con.cursor()
-            #     c3.execute(sql_3)
-            #     con.commit()
-            # except Exception as e:
-            #     print(e)
-            # else:
-            #     print("Update success")
+            sql_3 = "insert into user_product values(NULL, '"+ owner+"'," + str(model_id) + ")"
+            try:
+                c3 = con.cursor()
+                c3.execute(sql_3)
+                con.commit()
+            except Exception as e:
+                print(e)
+            else:
+                print("Insert into user_product success")
     except Exception as e:
         print(e)
     else:
@@ -191,26 +191,58 @@ def fromIdGetMessage(con, id):
         print(e)
     else:
         model_tuple = (count.fetchall())
-        return tuple2json(con, model_tuple)
+        return tuple2json(con, model_tuple[0])
 
 # 将模型信息包装为JSON
+def getUserModelIds(con, user):
+    sql = "select * from user_product where username='{}';".format(user)
+    c = con.cursor()
+    c.execute(sql)
+    con.commit()
+    result = (c.fetchall())
+    modelids = []
+    for entry in result:
+        modelids.append(int(entry[2]))
+    return modelids
 
+def getUserModels(con, user):
+    res = []
+    for id in getUserModelIds(con, user):
+        res.append(fromIdGetMessage(con, id))
+    return res
+
+def getModelsbyCategory(con, catelog):
+    sql = "select * from model where type_name='{}' limit 8".format(catelog)
+    c = con.cursor()
+    c.execute(sql)
+    con.commit()
+    result = (c.fetchall())
+    models = []
+    for entry in result:
+        models.append(tuple2json(con, entry))
+    return models
+
+def getModelsbyCategories(con, catelogs):
+    res = {}
+    for catelog in catelogs:
+        res[catelog] = getModelsbyCategory(con, catelog)
+    return res
 
 def tuple2json(con, model_tuple):
     print(model_tuple)
     model_json = {}
-    model_json['url'] = model_tuple[0][8]
-    model_json['name'] = model_tuple[0][1]
-    model_json['publish'] = model_tuple[0][3]
-    model_json['catalog'] = model_tuple[0][2]
-    model_json['num_triangles'] = model_tuple[0][4]
-    model_json['num_vertices'] = model_tuple[0][5]
-    model_json['tags'] = fromIdGetTag(con, model_tuple[0][0])
-    if model_tuple[0][6] == 0:
+    model_json['url'] = model_tuple[8]
+    model_json['name'] = model_tuple[1]
+    model_json['publish'] = model_tuple[3]
+    model_json['catalog'] = model_tuple[2]
+    model_json['num_triangles'] = model_tuple[4]
+    model_json['num_vertices'] = model_tuple[5]
+    model_json['tags'] = fromIdGetTag(con, model_tuple[0])
+    if model_tuple[6] == 0:
         model_json['animated'] = False
     else:
         model_json['animated'] = True
-    model_json['owner'] = model_tuple[0][7]
+    model_json['owner'] = model_tuple[7]
     print(model_json)
     return(model_json)
 
@@ -446,10 +478,10 @@ def getUserData(username):
     #print(modelURL)
     #read the avatar
     avatarPATH = "assets/avatars/{}.png".format(username)
-    f = open(avatarPATH, 'rb')
-    data=f.read()
-    avatar = base64.b64encode(data)
-    f.close()
+    # f = open(avatarPATH, 'rb')
+    # data=f.read()
+    # avatar = base64.b64encode(data)
+    # f.close()
     userJson = {}
     userJson['username'] = str(username)
     userJson['nickname'] = userTuple[0][1]
@@ -459,7 +491,7 @@ def getUserData(username):
     userJson['introduction'] = userTuple[0][4]
     userJson['collections'] = ""
     userJson['email'] = userTuple[0][6]
-    userJson['avatar'] = avatar
+    userJson['avatar'] = avatarPATH
     print(userJson)
     return userJson
 
