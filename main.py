@@ -13,12 +13,8 @@ app.config['MODEL_PATH'] = unzip_path
 auth = Auth(not_login={'code': 1, 'msg': 'User must be logged in'})
 
 
-@app.route("/media/image/<path:p>",methods=['GET','POST'])
-def retImage(p):
-    return send_from_directory(unzip_path,os.path.join(p,'scene.gltf'),as_attachment=True)
 
-
-@app.route("/media/model/<path:p>",methods=['GET','POST'])
+@app.route("/assets/<path:p>",methods=['GET','POST'])
 @auth.must_login()
 def retModel(p):
     print(os.path.join(unzip_path,p))
@@ -37,6 +33,7 @@ def upload_model():
         user = session['username']
         message = sendMessage(con, model_info,user)
         model_add_info,model_name,url = refine(message)
+        print(url)
         model_info['model'] = ''
         # print(model_add_info)
         # print(model_info)
@@ -61,7 +58,8 @@ def get_recommend():
     req = request.get_json()
     con = databaseInit()
     cat = req['catalogs']
-    return jsonify(getModelsbyCategories(con, cat))
+    r = getModelsbyCategories(con, cat)
+    return jsonify({'code':0,"data":r})
 
 
 @app.route('/api/user/register', methods=['POST', 'GET'])

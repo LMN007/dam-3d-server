@@ -13,6 +13,7 @@ assets/models
 *.bak
 
 *.sql
+*.db
 .vscode
 converter/node_modules/
 **/node_modules/
@@ -20,3 +21,4 @@ converter/yarn.lock
 **/snapshot2/
 **/avatars/
 **/assets/
+**/database/

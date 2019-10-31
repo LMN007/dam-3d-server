@@ -37,6 +37,7 @@ def createURL(con, model_dict):
 
 
 def sendMessage(con, model_dict,user):
+    print("send Message start")
     sql = "select max(model_ID) from model;"
     try:
         c = con.cursor()
@@ -46,13 +47,20 @@ def sendMessage(con, model_dict,user):
         print(e)
         raise e
     send_to_zzp = {}
-    model_id = c.fetchall()[0][0] + 1
+    temp = c.fetchall()[0][0]
+    print(temp)
+    if temp is None or type(temp) is None:
+        model_id = 1
+    else:
+        model_id = temp + 1
+    print("over")
     model_name = model_dict['name'].split(".")[0]
     model_base64 = model_dict['model']
     send_to_zzp['user'] = user
     send_to_zzp['name'] = model_name
     send_to_zzp['model_id'] = model_id
     send_to_zzp['model'] = model_base64
+    print("send Message Over")
     return send_to_zzp
 
 # 创建name和type表
@@ -94,19 +102,9 @@ def createTagTable(con):
     else:
         print("Create table tag success!")
 
-# 插入新model
 
-
-<<<<<<< HEAD
-def createGroupTable(con):
-    #sql = "create table group"
-
-
-def insertModel(con, model_dict, url):
-=======
 def insertModel(con, model_dict, model_add_dict, user, url):
->>>>>>> d33345e2bf940d7eaee60b910c48fe17cc1f1a70
-    model_name = model_dict['name']
+    model_name = model_dict['name'].split('.')[0]
     type_name = model_dict['catalog']
     publish_time = time.strftime(
         '%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
@@ -239,12 +237,13 @@ def tuple2json(con, model_tuple):
     model_json['num_triangles'] = model_tuple[4]
     model_json['num_vertices'] = model_tuple[5]
     model_json['tags'] = fromIdGetTag(con, model_tuple[0])
+    model_json['comments'] = []
     if model_tuple[6] == 0:
         model_json['animated'] = False
     else:
         model_json['animated'] = True
-    model_json['owner'] = model_tuple[7]
-    print(model_json)
+    model_json['owner'] = getUserData(model_tuple[7]) #model_tuple[7]
+    # print(model_json)
     return(model_json)
 
 

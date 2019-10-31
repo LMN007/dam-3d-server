@@ -4,8 +4,8 @@ import requests
 from bits.snapshot import *
 import json
 target_format = ".gltf"
-cache_path = "./assets/cache"
-unzip_path = "./assets"
+cache_path = "assets/cache"
+unzip_path = "assets"
 # unzip_path = "./assets/models"
 headers = {'Content-Type': 'application/json'}
 
@@ -59,7 +59,7 @@ def refine(message):
         model_info = modelSnapshot(os.path.abspath('./bits/template.html'),os.path.abspath(model_path),"../"+os.path.join(model_path,convert_file).replace("\\","/"))
     else:
         return None
-    return model_info,model_name, model_path
+    return model_info,model_name, model_path.replace("\\","/")
 
 
 
