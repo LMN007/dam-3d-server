@@ -209,8 +209,8 @@ def getUserModels(con, user):
         res.append(fromIdGetMessage(con, id))
     return res
 
-def getModelsbyCategory(con, catelog):
-    sql = "select * from model where type_name='{}' limit 8".format(catelog)
+def getModelsbyCategory(con, catelog, max):
+    sql = "select * from model where type_name='{}' limit {}".format(catelog, max)
     c = con.cursor()
     c.execute(sql)
     con.commit()
@@ -223,7 +223,7 @@ def getModelsbyCategory(con, catelog):
 def getModelsbyCategories(con, catelogs):
     res = {}
     for catelog in catelogs:
-        res[catelog] = getModelsbyCategory(con, catelog)
+        res[catelog] = getModelsbyCategory(con, catelog, 8)
     return res
 
 def tuple2json(con, model_tuple):
