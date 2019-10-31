@@ -36,8 +36,7 @@ def createURL(con, model_dict):
         return url
 
 
-def sendMessage(con, model_dict,user):
-    print("send Message start")
+def sendMessage(con, model_info,user):
     sql = "select max(model_ID) from model;"
     try:
         c = con.cursor()
@@ -46,7 +45,7 @@ def sendMessage(con, model_dict,user):
     except Exception as e:
         print(e)
         raise e
-    send_to_zzp = {}
+    message = {}
     temp = c.fetchall()[0][0]
     print(temp)
     if temp is None or type(temp) is None:
@@ -54,14 +53,14 @@ def sendMessage(con, model_dict,user):
     else:
         model_id = temp + 1
     print("over")
-    model_name = model_dict['name'].split(".")[0]
-    model_base64 = model_dict['model']
-    send_to_zzp['user'] = user
-    send_to_zzp['name'] = model_name
-    send_to_zzp['model_id'] = model_id
-    send_to_zzp['model'] = model_base64
-    print("send Message Over")
-    return send_to_zzp
+    model_name = model_info['name'].split(".")[0]
+    model_base64 = model_info['model']
+    message['user'] = user
+    message['name'] = model_name
+    message['model_id'] = model_id
+    message['model'] = model_base64
+    message['render_config'] = model_info['render_config']
+    return message
 
 # 创建name和type表
 

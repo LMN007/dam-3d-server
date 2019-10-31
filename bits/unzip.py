@@ -57,6 +57,12 @@ def refine(message):
         convert_file = res['converted']
     if ok:
         model_info = modelSnapshot(os.path.abspath('./bits/template.html'),os.path.abspath(model_path),"../"+os.path.join(model_path,convert_file).replace("\\","/"))
+        render_config = message['render_config']
+        print(render_config)
+        render_config['scale'] = model_info['scale']
+        print(render_config)
+        with open(os.path.join(model_path,"render.json"),"w",encoding="utf-8") as f:
+            f.write(json.dumps(render_config))
     else:
         return None
     return model_info,model_name, model_path.replace("\\","/")

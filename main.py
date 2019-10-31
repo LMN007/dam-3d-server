@@ -29,15 +29,10 @@ def upload_model():
         model_info = request.get_json()
         print(model_info['filename'])
         con = databaseInit()
-        # url = createURL(con, model_info)
         user = session['username']
         message = sendMessage(con, model_info,user)
         model_add_info,model_name,url = refine(message)
-        print(url)
         model_info['model'] = ''
-        # print(model_add_info)
-        # print(model_info)
-        # print(model_name)
         insertModel(con, model_info, model_add_info, user, url)
         return jsonify({'code': 0, 'data':{'preview':model_name}})
     except Exception as e:
@@ -199,7 +194,7 @@ def updateRenderConfig():
         model_path = os.path.join(unzip_path,split[-2],split[-1])
         print(model_path)
         config = form['config']
-        with open(os.path.join(model_path,"config.json"),"w") as f:
+        with open(os.path.join(model_path,"render.json"),"w") as f:
             f.write(json.dumps(config))
         return jsonify({"code":0,"msg":"success"})
     except Exception as e:
