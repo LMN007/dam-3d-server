@@ -47,14 +47,15 @@ def sendMessage(con, model_info,user):
         raise e
     message = {}
     temp = c.fetchall()[0][0]
-    print(temp)
     if temp is None or type(temp) is None:
         model_id = 1
     else:
         model_id = temp + 1
-    print("over")
-    model_name = model_info['name'].split(".")[0]
+    a = "5"
     model_base64 = model_info['model']
+    message['format'] = model_info['filename'].split(".")[-1]
+    model_name = model_info['filename'].split(".")[0]
+    # model_name = model_info['filename'][0:len(model_info['filename'])-len(message['format']-1)]
     message['user'] = user
     message['name'] = model_name
     message['model_id'] = model_id
@@ -171,10 +172,19 @@ def fuzzyName(con, name_list, input_name):
     fuzzy_sorted = {}
     for name in name_list:
         fuzzy_dict[name[0]] = fuzz.ratio(name[1], input_name)
+    models_list = []
+    count = 0
     for k in sorted(fuzzy_dict, key=fuzzy_dict.__getitem__, reverse=True):
         fuzzy_sorted[k] = fuzzy_dict[k]
-    print(fuzzy_sorted)
-    return fuzzy_sorted
+        tmp = fromIdGetMessage(con, k)
+        if tmp is None:
+            continue
+        models_list.append(tmp)
+        count = count+1
+        if count >= 8:
+            break
+    # print(models_list)
+    return models_list
 
 # 根据id获取模型全部信息
 
@@ -183,13 +193,16 @@ def fromIdGetMessage(con, id):
     sql = "select * from model where model_ID = " + str(id) + ";"
     try:
         c = con.cursor()
-        count = c.execute(sql)
+        c.execute(sql)
         con.commit()
     except Exception as e:
         print(e)
     else:
-        model_tuple = (count.fetchall())
-        return tuple2json(con, model_tuple[0])
+        model_tuple = (c.fetchall())
+        if len(model_tuple):
+            return tuple2json(con, model_tuple[0])
+        else:
+            return None
 
 # 将模型信息包装为JSON
 def getUserModelIds(con, user):
@@ -206,7 +219,10 @@ def getUserModelIds(con, user):
 def getUserModels(con, user):
     res = []
     for id in getUserModelIds(con, user):
-        res.append(fromIdGetMessage(con, id))
+        tmp = fromIdGetMessage(con, id)
+        if tmp is None:
+            continue
+        res.append(tmp)
     return res
 
 def getModelsbyCategory(con, catelog):
@@ -227,9 +243,9 @@ def getModelsbyCategories(con, catelogs):
     return res
 
 def tuple2json(con, model_tuple):
-    print(model_tuple)
+    # print(model_tuple)
     model_json = {}
-    model_json['url'] = model_tuple[8]
+    model_json['url'] = '/' + model_tuple[8]
     model_json['name'] = model_tuple[1]
     model_json['publish'] = model_tuple[3]
     model_json['catalog'] = model_tuple[2]
@@ -257,7 +273,10 @@ def fromTagGetName(con, tag_name):
     else:
         model_list = []
         for id in c.fetchall():
-            model_list.append(fromIdGetMessage(con, id[0]))
+            tmp = fromIdGetMessage(con, id)
+            if tmp is None:
+                continue
+            model_list.append(tmp)
         return model_list
 
 
@@ -491,38 +510,26 @@ def getUserData(username):
     userJson['collections'] = ""
     userJson['email'] = userTuple[0][6]
     userJson['avatar'] = avatarPATH
-    print(userJson)
+    # print(userJson)
     return userJson
 
 
-def databaseInit():
+def databaseInit(flag=False):
     con = sqlite3.connect('database/models.db')
-    createModelsTable(con)
-    createTagTable(con)
-    model_dict = {
-        'url': '/JSON',  #
-        'name': 'zzpdl.gltf',   #
-        'publish': 'time',
-        #'comments': [],
-        'catalog': 'Human',
-        'num_triangles': 100,  #
-        'num_vertices': 150,  #
-        'tags': ['kami', 'sama'],
-        'animated': False,   #
-        'render_config': 'string',
-        'owner': 'string'
-    }
+    if flag:
+        createModelsTable(con)
+        createTagTable(con)
+    # model_dict = {
+    #     'url': '/JSON',  #
+    #     'name': 'zzpdl.gltf',   #
+    #     'publish': 'time',
+    #     #'comments': [],
+    #     'catalog': 'Human',
+    #     'num_triangles': 100,  #
+    #     'num_vertices': 150,  #
+    #     'tags': ['kami', 'sama'],
+    #     'animated': False,   #
+    #     'render_config': 'string',
+    #     'owner': 'string'
+    # }
     return con
-    # url = createURL(con, model_origin)
-    # message = sendMessage(con, model_origin)
-    # with open("./a_simple_pokeball.zip","rb") as f:
-    #     message['model'] = base64.b64encode(f.read())
-    # model_info,path = lzw(message)
-    # print(model_info)
-    # print(path)
-
-    # insertModel(con, model_dict, url)
-
-    # # 5、输入关键词，返回id和匹配度的字典
-    # fuzzyName(con, selectNameFromModel(con), "zp")
-    # # {7: 100, 1: 80, 2: 80, 3: 80, 4: 80, 8: 80, 5: 67, 6: 67, 9: 67, 10: 67, 11: 67, 12: 67, 13: 67, 14: 67, 15: 67, 16: 67, 17: 67, 18: 67}

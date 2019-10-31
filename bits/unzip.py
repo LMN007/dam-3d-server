@@ -58,9 +58,9 @@ def refine(message):
     if ok:
         model_info = modelSnapshot(os.path.abspath('./bits/template.html'),os.path.abspath(model_path),"../"+os.path.join(model_path,convert_file).replace("\\","/"))
         render_config = message['render_config']
-        print(render_config)
+        # print(render_config)
         render_config['scale'] = model_info['scale']
-        print(render_config)
+        # print(render_config)
         with open(os.path.join(model_path,"render.json"),"w",encoding="utf-8") as f:
             f.write(json.dumps(render_config))
     else:
@@ -90,7 +90,7 @@ def base64toFiles(src_file_data,user,src_name):
 
     zip = zipfile.ZipFile(cache_zip)
     model_path = os.path.join(unzip_path_user,zip_name)
-    print(model_path)
+    # print(model_path)
     if os.path.exists(model_path) is not True:
         os.mkdir(model_path)
     zip.extractall(path=model_path)
