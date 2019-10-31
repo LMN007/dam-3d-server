@@ -63,6 +63,15 @@ def get_recommend():
     return jsonify({'code':0,"data":r})
 
 
+@app.route('/api/list/categories/all', methods=['POST', 'GET'])
+def get_by_catagories():
+    req = request.get_json()
+    con = databaseInit()
+    cat = req['catalog']
+    r = getModelsbyCategory(con, cat, 9999)
+    return jsonify({'code':0,"data":r})
+
+
 @app.route('/api/user/register', methods=['POST', 'GET'])
 def register():
     try:
