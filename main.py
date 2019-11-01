@@ -14,13 +14,11 @@ app.config['MODEL_PATH'] = unzip_path
 auth = Auth(not_login={'code': 1, 'msg': 'User must be logged in'})
 
 
-
 @app.route("/assets/<path:p>",methods=['GET','POST'])
 @auth.must_login()
 def retModel(p):
     # print(os.path.join(unzip_path,p))
     return send_from_directory(unzip_path,p)
-
 
 
 @app.route("/api/upload/model", methods = ['GET', 'POST'])
@@ -75,11 +73,7 @@ def get_by_catagories():
 @app.route('/api/user/register', methods=['POST', 'GET'])
 def register():
     try:
-        #form = RegistrationForm(request.get_json())
         form = request.get_json()
-        #print(form)
-        #if request.method == 'POST' and form.validate():
-        #if True:
         error,msg=registerUser(form)
         # print(msg)
         if not error:
@@ -216,14 +210,15 @@ def updateRenderConfig():
         return jsonify({"code":1,"msg":"{}".format(e)})
 
 
-@app.route('/api/search')
+@app.route('/api/search',methods=['POST'])
 def search():
     try:
+        con = databaseInit()
         keywords = request.get_json()
         keyword = keywords['key']
         name_list = selectNameFromModel(con)
         data = fuzzyName(con, name_list, keyword)
-        return jsonify({'code':0,'data':"{}".format(data),'msg':"success"})
+        return jsonify({'code':0,'data':data,'msg':"success"})
     except Exception as e:
         return jsonify({'code':5,'msg':"{}".format(e)})
 
@@ -240,6 +235,25 @@ def getModelNum():
         return jsonify({"code":0,"data":num})
     except Exception as e:
         return jsonify({"code":1,"data":"{}".format(e)})
+
+
+@app.route("/api/getModelByCatalog" ,methods=['POST'])
+def getMdodelByCatalog():
+    try:
+        con = databaseInit()
+        cursor = con.cursor()
+        keywords = request.get_json()
+        catalog = keywords['key']
+        sql = "select model_ID from model where type_name = '" + catalog + "'"
+        cursor.execute(sql)
+        con.commit()
+        ids = cursor.fetchall()
+        data = []
+        for id in ids:
+            data.append(fromIdGetMessage(con,id[0]))
+        return jsonify({"code":0,"data":data})
+    except Exception as e:
+        return jsonify({"code":1,"msg":"{}".format(e)})
 
 
 if __name__ == "__main__":

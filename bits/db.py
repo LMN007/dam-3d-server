@@ -156,6 +156,7 @@ def insertModel(con, model_dict, model_add_dict, user, url):
 
 
 def selectNameFromModel(con):
+    print("selectName")
     sql = "select model_ID, model_name from model"
     try:
         c = con.cursor()
@@ -488,12 +489,17 @@ def getUserData(username):
     userTuple = x.fetchall()
 
     u = cur.execute(
-        'select model_ID,url from model where model_ID in (select modelID from user_product where username = ?)', [username])
-    URL = u.fetchall()
-    modelURL = []
-    for each in URL:
-        modelURL.append(str(each[1]))
+        "select count(*) from user_product where username = '" + str(username) + "'"
+    )
+    model_nums = u.fetchall()[0][0]
+    # u = cur.execute(
+    #     'select model_ID,url from model where model_ID in (select modelID from user_product where username = ?)', [username])
+    # URL = u.fetchall()
+    # modelURL = []
+    # for each in URL:
+    #     modelURL.append(str(each[1]))
     #print(modelURL)
+
     #read the avatar
     avatarPATH = "assets/avatars/{}.png".format(username)
     # f = open(avatarPATH, 'rb')
@@ -504,7 +510,8 @@ def getUserData(username):
     userJson['username'] = str(username)
     userJson['nickname'] = userTuple[0][1]
     userJson['biography'] = userTuple[0][5]
-    userJson['owned_models'] = modelURL
+    # userJson['owned_models'] = modelURL
+    userJson['owned_models'] = model_nums
     userJson['location'] = userTuple[0][3]
     userJson['introduction'] = userTuple[0][4]
     userJson['collections'] = ""

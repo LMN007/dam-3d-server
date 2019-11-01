@@ -48,8 +48,6 @@ def refine(message):
         data = {
             "src":os.path.abspath(os.path.join(model_path,convert_file)).replace("\\","/"),
             "dst":os.path.abspath(model_path).replace("\\","/")
-            # "src":os.path.abspath(os.path.join(model_path,convert_file).replace("\\","/")),
-            # "dst":os.path.abspath(os.path.join(unzip_path_user,model_name).replace("\\","/"))
         }
         sign = requests.post("http://127.0.0.1:5300/api/obj2gltf",headers=headers,data=json.dumps(data))
         res = json.loads(bytes.decode(sign.content))

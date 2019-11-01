@@ -60,14 +60,7 @@ app.post("/api/obj2gltf", bodyParser.json(), async (req,res) => {
 	});
 	res.write(JSON.stringify({'ok':ok,'converted':converted}));
 	res.end();
-	// const src = req.body['src'];
-	// const dst = req.body['dst'];
-    // // const obj_name = './source/model';
-    // obj2gltf(src_path)
-    //     .then(function(gltf) {
-    //         const data = Buffer.from(JSON.stringify(gltf));
-    //         fs.writeFileSync(gltf_path+'/'+model_name+'.gltf', data);
-    //     });
+
 });
 
 
@@ -107,19 +100,5 @@ app.post("/api/fbx2gltf", bodyParser.json(), async (req,res) => {
 	);
 	res.write(JSON.stringify({'ok':ok,'converted':converted}));
 	res.end();
-	// try{
-	// 	console.log("fbx2gltf start");
-	// 	const dstPath = await fbx2gltf(src, dst+'/scene.gltf', ['--khr-materials-unlit']);
-	// 	res.write({
-	// 		ok: true
-	// 	})
-	// 	console.log("success");
-	// }
-	// catch(e){
-	// 	res.write({
-	// 		ok:e
-	// 	})
-	// 	console.log("failed");
-	// }
-	
+
 });

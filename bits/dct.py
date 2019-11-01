@@ -34,14 +34,14 @@ def DCT(url, img):
 	c2 = np.size(hostf, 1)
 	rows = int(c1/8)
 	cols = int(c2/8)
-	print(rows, cols)
+	# print(rows, cols)
 	max_message = rows*cols
 
 	w1 = np.size(bsrc, 0)
 	w2 = np.size(bsrc, 1)
-	print(w1*w2, max_message)
+	# print(w1*w2, max_message)
 	if w1*w2 > max_message:
-		print("No")
+		# print("No")
 		return
 
 	for i in range(bsrc.shape[0]):
