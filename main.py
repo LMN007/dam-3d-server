@@ -223,7 +223,7 @@ def search():
         return jsonify({'code':5,'msg':"{}".format(e)})
 
 
-@app.route("/api/getModelNum",methods=["POST"])
+@app.route("/api/model/count",methods=["POST"])
 def getModelNum():
     try:
         con = databaseInit()

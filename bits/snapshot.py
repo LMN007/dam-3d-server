@@ -14,7 +14,7 @@ chrome_options.add_argument('--disable-gpu')
 # chrome_options.add_argument("--start-maximized")
 # chrome_options.add_argument('window-size=2560,1440')
 chrome_options.add_argument("--log-level=3")
-driver = webdriver.Chrome(chrome_options=chrome_options, executable_path="./chromedriver.exe")
+driver = webdriver.Chrome(chrome_options=chrome_options, executable_path="chromedriver.exe")
 
 
 def modelSnapshot(template_path, save_path,data_path):

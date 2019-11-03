@@ -182,7 +182,7 @@ def fuzzyName(con, name_list, input_name):
             continue
         models_list.append(tmp)
         count = count+1
-        if count >= 8:
+        if count >= 10:
             break
     # print(models_list)
     return models_list
@@ -501,7 +501,7 @@ def getUserData(username):
     #print(modelURL)
 
     #read the avatar
-    avatarPATH = "assets/avatars/{}.png".format(username)
+    avatarPATH = "/assets/avatars/{}.png".format(username)
     # f = open(avatarPATH, 'rb')
     # data=f.read()
     # avatar = base64.b64encode(data)
