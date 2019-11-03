@@ -1,9 +1,7 @@
 import cv2
 import numpy as np
-import math
 import qrcode
 import os
-from PIL import Image
 
 def createCode(username, url):
 	qr = qrcode.QRCode(     
