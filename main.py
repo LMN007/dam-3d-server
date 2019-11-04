@@ -33,11 +33,13 @@ def upload_model():
         message = sendMessage(con, model_info,user)
         # print(message)
         model_add_info,model_name,url = refine(message)
+        # print("refine over")
         model_info['model'] = ''
         dctWaterMarking(url, user)
         insertModel(con, model_info, model_add_info, user, url)
         return jsonify({'code': 0, 'data':{'preview':model_name}})
     except Exception as e:
+        print(e)
         return jsonify({'code':1, 'msg': '{}'.format(e)})
 
 

@@ -65,7 +65,42 @@ def sendMessage(con, model_info,user):
 
 # 创建name和type表
 
+#建立user表
+def createUserTable(con):
+    sql ="create table user (username text primary key,"\
+        "nickname text,"\
+        "password text not null,"\
+        "location text,"\
+        "introduction varchar(128),"\
+        "biography text,"\
+        "email text,"\
+        "avatar text)"
+    try:
+        c = con.cursor()
+        c.execute(sql)
+        con.commit()
+    except Exception as e:
+        print(e)
+    else:
+        print("Create table user success!")
 
+#建立user_product表
+def createUserProductTable(con):
+    sql ="create table user_product (pk integer primary key autoincrement,"\
+        "username text,"\
+        "modelID integer,"\
+        "foreign key(username) references user(username),"\
+        "foreign key(modelID) references model(model_ID))"
+    try:
+        c = con.cursor()
+        c.execute(sql)
+        con.commit()
+    except Exception as e:
+        print(e)
+    else:
+        print("Create table user_product success!")
+
+# 建立Tag表
 def createModelsTable(con):
     sql = "create table model (model_ID INTEGER PRIMARY KEY AUTOINCREMENT, "\
         "model_name varchar(20),"\
@@ -526,6 +561,8 @@ def databaseInit(flag=False):
     if flag:
         createModelsTable(con)
         createTagTable(con)
+        createUserTable(con)
+        createUserProductTable(con)
     # model_dict = {
     #     'url': '/JSON',  #
     #     'name': 'zzpdl.gltf',   #

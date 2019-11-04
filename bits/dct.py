@@ -37,9 +37,9 @@ def DCT(url, img):
 
 	w1 = np.size(bsrc, 0)
 	w2 = np.size(bsrc, 1)
-	# print(w1*w2, max_message)
-	if w1*w2 > max_message:
-		# print("No")
+	print(w1*w2, max_message)
+	if w1*w2 > max_message or (w1>rows) or (w2>cols):
+		print("No")
 		return
 
 	for i in range(bsrc.shape[0]):
@@ -85,15 +85,15 @@ def extract(sizex,sizey):
 def dctWaterMarking(url, username):
 	#url = "./bits/images"
 	code_path = url + "/code"
-	print(os.path.abspath(url))
+	# print(os.path.abspath(url))
 	if not(os.path.exists(code_path)):
 		os.mkdir(code_path)
 	if os.path.exists(os.path.join(url, "textures")):
 		img_ls = [os.path.join("textures",i) for i in os.listdir(os.path.join(url,"textures")) if ((i.endswith('png') or i.endswith('jpeg') or i.endswith('jpg')) and not(i.startswith('preview')))]
 	else:
 		img_ls = [i for i in os.listdir(url) if ((i.endswith('png') or i.endswith('jpeg') or i.endswith('jpg')) and not(i.startswith('preview')))]
-	print(img_ls)
 	createCode(username, url)
 	for img in img_ls:
+		print(img)
 		DCT(url, img)
 
