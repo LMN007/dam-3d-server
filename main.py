@@ -5,13 +5,14 @@ from bits.dct import *
 from contextlib import closing
 from bits.auth import Auth
 #from wtforms import Form, TextField, PasswordField, BooleanField, validators
+webroot = 'web/'
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=webroot + 'static')
 app.secret_key = '123456'
 
 app.config['MODEL_PATH'] = unzip_path
 
-auth = Auth(not_login={'code': 1, 'msg': 'User must be logged in'})
+auth = Auth(not_login={'code': 1, 'msg': 'User must be logged in'}, disable_must_login=True)
 
 
 @app.route("/assets/<path:p>",methods=['GET','POST'])
@@ -256,6 +257,19 @@ def getMdodelByCatalog():
         return jsonify({"code":1,"msg":"{}".format(e)})
 
 
+@app.route("/")
+def index():
+    return send_from_directory(webroot, 'index.html')
+
+@app.route("/<p>")
+def index_others(p):
+    return send_from_directory(webroot, p)
+
+@app.route("/image/<path:p>")
+def image(p):
+    return send_from_directory(webroot + 'image/', p)
+
+
 if __name__ == "__main__":
     con = databaseInit(True)
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port='8080', ssl_context=('cert.pem', 'key.pem'))

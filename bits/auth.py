@@ -13,8 +13,9 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 class Auth:
-    def __init__(self, *, not_login):
+    def __init__(self, *, not_login, disable_must_login=False):
         self.not_login = not_login
+        self.disable_must_login = disable_must_login
     
     def log(self, *args, **kw):
         print(bcolors.OKBLUE, *args, bcolors.ENDC,  **kw)
@@ -31,10 +32,17 @@ class Auth:
     def grant(self):
         self.ok('[Granted]'.format(), end='', flush=True)
 
+    def disabled(self):
+        self.ok('[Disabled]'.format(), end='', flush=True)
+
     def must_login(self, *fail):
         def auth_wrapper_fn(func):
             @wraps(func)
             def auth_wrapper(*args, **kw):
+                if self.disable_must_login:
+                    the_res = func(*args, **kw) 
+                    self.disabled()
+                    return the_res
                 if (not 'logged_in' in session) or not session['logged_in']:
                     self.reject('not logged in')
                     if len(fail):
