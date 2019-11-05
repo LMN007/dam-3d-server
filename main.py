@@ -120,13 +120,13 @@ def login():
         return jsonify({'code':4,'msg':"{}".format(e)})
 
 
-@app.route('/api/user/logout')
+@app.route('/api/user/logout', methods=['POST', 'GET'])
 def logout():
     session.pop('logged_in', None)
     return jsonify({'code':0,'msg':"success"})
 
 
-@app.route('/api/user/update/avatar')
+@app.route('/api/user/update/avatar', methods=['POST', 'GET'])
 @auth.must_login()
 def updateAvatar():
     try:
@@ -143,7 +143,7 @@ def updateAvatar():
          return jsonify({'code':4,'msg':"{}".format(e)})
 
 
-@app.route('/api/user/update/passwd')
+@app.route('/api/user/update/passwd', methods=['POST', 'GET'])
 @auth.must_login()
 def updatePasswd():
     try:
@@ -161,18 +161,19 @@ def updatePasswd():
          return jsonify({'code':4,'msg':"{}".format(e)})
 
 
-@app.route('/api/user/update/basic')
+@app.route('/api/user/update/basic', methods=['POST', 'GET'])
 @auth.must_login()
 def updateBasic():
     try:
         form = request.get_json()
+        form['username'] = session['username']
         error,msg=dbUpdateBasic(form)
         if error:
             return jsonify({'code':1,'msg':"{}".format(msg)})
         else:           
             #return redirect(url_for('login'))
             data=getUserData(form['username'])
-            print({'code':0,'data':"{}".format(data),'msg':"{}".format(msg)})
+            # print({'code':0,'data':"{}".format(data),'msg':"{}".format(msg)})
             return jsonify({'code':0,'data':"{}".format(data),'msg':"{}".format(msg)})
 
     except Exception as e:

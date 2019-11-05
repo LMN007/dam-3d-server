@@ -494,6 +494,7 @@ def dbUpdateBasic(form):
     error = False
     msg = ''
     username = form['username']
+    nickname = form['nickname']
     location = form['location']
     introduction = form['introduction']
     biography = form['biography']
@@ -501,8 +502,8 @@ def dbUpdateBasic(form):
 
     db = databaseInit()
     cur = db.cursor()
-    cur.execute("UPDATE user SET location = ?, introduction = ?, biography = ?, email = ? WHERE username = ?", [
-                location, introduction, biography, email, username])
+    cur.execute("UPDATE user SET location = ?, introduction = ?, biography = ?, email = ?, nickname = ? WHERE username = ?", [
+                location, introduction, biography, email, nickname, username])
     db.commit()
     cur.close()
     db.close()
