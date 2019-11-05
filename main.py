@@ -274,5 +274,6 @@ def image(p):
 
 
 if __name__ == "__main__":
+    os.system("node ./converter/server.js")
     con = databaseInit(True)
     app.run(debug=True, host='0.0.0.0', port='8080', ssl_context=('cert.pem', 'key.pem'))
