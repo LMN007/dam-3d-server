@@ -9,7 +9,7 @@ itsdangerous==1.1.0
 Jinja2==2.10.3
 MarkupSafe==1.1.1
 numpy==1.17.3
-opencv-python==4.1.1.26
+opencv-python==4.2.0.32
 passlib==1.7.1
 qrcode==6.1
 requests==2.22.0
